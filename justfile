@@ -1,9 +1,14 @@
 pre-emacs:
         cargo install cargo-cache tree-sitter-cli
+        npm install -g @anthropic-ai/claude-agent-sdk
+        npm install lamdera@latest elm-review elm-test-rs elm@latest-0.19.1 elm-format @elm-tooling/elm-language-server
 
 default:
         sudo apt update
         sudo apt upgrade
+        cargo install-update -a
+        npm -g update
+        npm -g upgrade
 
 emacs: default pre-emacs
     sudo apt install emacs-nox -y
@@ -41,6 +46,7 @@ primerito: default
      @read -p "Enter the text to add: " input; \
      echo "$input" >> ~/.ssh/authorized_keys
      chmod 600 ~/.ssh/authorized_keys
+     cargo install cargo-update
 
 config-ccode:
     # por definir clonar .claude en mi github repo
