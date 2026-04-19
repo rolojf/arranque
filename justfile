@@ -50,6 +50,7 @@ primerito: default
      mkdir -p ~/.local/share/Trash/{files,info}
      sudo apt install trash-cli
      ln -s ~/arranque/justfile ~/.justfile
+     cp ~/arranque/.bash_profile ~/
 
 config-ccode:
     # por definir clonar .claude en mi github repo
