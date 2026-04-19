@@ -2,6 +2,7 @@ pre-emacs:
         cargo install cargo-cache tree-sitter-cli
         npm install -g @anthropic-ai/claude-agent-sdk
         npm install lamdera@latest elm-test-rs elm@latest-0.19.1 elm-format @elm-tooling/elm-language-server prettier
+        sudo apt install hunspell hunspell-en-us hunspell-es
 
 default:
         sudo apt update
@@ -50,7 +51,7 @@ primerito: default
      mkdir -p ~/.local/share/Trash/{files,info}
      sudo apt install trash-cli
      ln -s ~/arranque/justfile ~/.justfile
-     cp ~/arranque/.bash_profile ~/
+     ln -s ~/arranque/.bash_profile ~/
 
 config-ccode:
     # por definir clonar .claude en mi github repo
