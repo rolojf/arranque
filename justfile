@@ -49,7 +49,7 @@ primerito: default
      cargo install cargo-update
      mkdir -p ~/.local/share/Trash/{files,info}
      sudo apt install trash-cli
-
+     ln -s ~/arranque/justfile ~/.justfile
 
 config-ccode:
     # por definir clonar .claude en mi github repo
