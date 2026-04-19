@@ -1,7 +1,7 @@
 pre-emacs:
         cargo install cargo-cache tree-sitter-cli
         npm install -g @anthropic-ai/claude-agent-sdk
-        npm install lamdera@latest elm-review elm-test-rs elm@latest-0.19.1 elm-format @elm-tooling/elm-language-server
+        npm install lamdera@latest elm-test-rs elm@latest-0.19.1 elm-format @elm-tooling/elm-language-server prettier
 
 default:
         sudo apt update
@@ -47,6 +47,9 @@ primerito: default
      echo "$input" >> ~/.ssh/authorized_keys
      chmod 600 ~/.ssh/authorized_keys
      cargo install cargo-update
+     mkdir -p ~/.local/share/Trash/{files,info}
+     sudo apt install trash-cli
+
 
 config-ccode:
     # por definir clonar .claude en mi github repo
