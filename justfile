@@ -12,7 +12,7 @@ default:
         npm -g upgrade
 
 emacs: default pre-emacs
-    sudo apt install emacs-nox -y
+    sudo apt install emacs ripgrep -y
     git clone --depth 1 https://github.com/plexus/chemacs2.git ~/.emacs.d
     git clone --depth 1 https://github.com/purcell/emacs.d.git ~/purcell
     rm -rf ~/purcell/site-lisp
