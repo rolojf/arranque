@@ -1,6 +1,6 @@
 pre-emacs:
         cargo install cargo-cache tree-sitter-cli
-        npm install -g @anthropic-ai/claude-agent-sdk
+        npm install -g @agentclientprotocol/claude-agent-acp
         npm install lamdera@latest elm-test-rs elm@latest-0.19.1 elm-format @elm-tooling/elm-language-server prettier
         sudo apt install hunspell hunspell-en-us hunspell-es
 
