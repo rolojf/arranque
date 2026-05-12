@@ -7,7 +7,7 @@ pre-emacs:
 default:
         sudo apt update
         sudo apt upgrade
-        cargo install-update -a
+        cargo install-update -a -c /.sprite/languages/rust/cargo
         npm -g update
         npm -g upgrade
 
