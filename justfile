@@ -20,6 +20,7 @@ emacs: default pre-emacs
     rm ~/purcell/site-lisp/setup-wsl.el
     sed -i 's/^(require '\''setup-wsl)$/;; (require '\''setup-wsl)/' ~/purcell/site-lisp/init-local.el
     echo "(("default" . ((user-emacs-directory . "~/purcell"))))" >> ~/.emacs-profiles.el
+    echo 'export EDITOR="emacsclient -nw"' >> ~/.bashrc
 
 # confirmar primero que npm (me parece extraño ) no esté en el PATH, corregir con
 npm-en-path:
