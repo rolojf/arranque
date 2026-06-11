@@ -56,3 +56,46 @@ primerito: default
 
 config-ccode:
     # por definir clonar .claude en mi github repo
+
+# install hermes-agent (git method); interactive — answer setup-hermes.sh prompts
+hermes-install:
+    #!/bin/bash
+    set -euo pipefail
+    echo ">>> Cloning hermes-agent and running its setup."
+    echo ">>> Prompts: Y to ripgrep; wizard Y/N as you prefer (it configures LLM keys + Telegram)."
+    mkdir -p ~/.hermes
+    git clone --depth 1 https://github.com/NousResearch/hermes-agent.git ~/.hermes/hermes-agent
+    cd ~/.hermes/hermes-agent
+    ./setup-hermes.sh
+    echo ""
+    echo ">>> Next, configure the basics ('hermes setup' wizard, or edit ~/.hermes/.env):"
+    echo ">>>   OPENROUTER_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_ALLOWED_USERS, TELEGRAM_HOME_CHANNEL"
+    echo ">>> Do NOT set TELEGRAM_WEBHOOK_* — polling mode is required for wake-on-demand."
+    echo ">>> Then run: just hermes-wake-config"
+
+# wake-on-demand: waker service + task hold + pre_llm_call hook. Run AFTER keys are set.
+hermes-wake-config:
+    #!/bin/bash
+    set -euo pipefail
+    mkdir -p ~/bin ~/.hermes/agent-hooks ~/.hermes/logs
+    cp {{justfile_directory()}}/hermes/start-hermes.sh ~/bin/
+    cp {{justfile_directory()}}/hermes/start-waker.sh ~/bin/
+    cp {{justfile_directory()}}/hermes/waker.py ~/bin/
+    cp {{justfile_directory()}}/hermes/refresh-task.sh ~/.hermes/agent-hooks/
+    chmod +x ~/bin/start-hermes.sh ~/bin/start-waker.sh ~/.hermes/agent-hooks/refresh-task.sh
+    ~/.hermes/hermes-agent/venv/bin/python {{justfile_directory()}}/hermes/configure-hooks.py
+    sprite-env services create hermes --cmd "$HOME/bin/start-hermes.sh"
+    sprite-env services create waker --cmd "$HOME/bin/start-waker.sh" --http-port 8080
+    echo ">>> Verifying — waker response (expect 'awake'):"
+    curl -s http://localhost:8080/
+    echo ">>> Services:"
+    sprite-env services list
+    echo ">>> Task hold (expect hermes-active with expires_at):"
+    curl -s --unix-socket /.sprite/api.sock -H "Host: sprite" http://sprite/v1/tasks
+    echo ""
+    echo ">>> Manual steps left:"
+    echo ">>>  1. From your machine, set the sprite URL auth to public (sprite CLI / dashboard)."
+    echo ">>>  2. Bookmark the sprite_url below on the phone (Firefox):"
+    sprite-env info
+    echo ">>>  3. Checkpoint: sprite-env checkpoints create --comment 'hermes wake-on-demand ready'"
+    echo ">>> Usage: send a Telegram message, THEN tap the bookmark; the reply arrives after wake."
