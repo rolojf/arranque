@@ -7,9 +7,9 @@ pre-emacs:
 default:
         sudo apt update
         sudo apt upgrade
-        cargo install-update -a -c /.sprite/languages/rust/cargo
         npm -g update
         npm -g upgrade
+        cargo install-update -a -c /.sprite/languages/rust/cargo
 
 emacs: default pre-emacs
     sudo apt install emacs ripgrep -y
@@ -38,6 +38,24 @@ setup-ssh:
     fi
         sudo service ssh start
         service ssh status
+
+# Apply sshd_config for the laptop remote-control workflow (X11 + keepalive + forwarding).
+# Idempotent. Run after `primerito`/`setup-ssh`. Reload keeps existing connections alive.
+sshd-remote-config:
+    #!/bin/bash
+    set -euo pipefail
+    sudo tee /etc/ssh/sshd_config.d/10-sprite-remote.conf > /dev/null <<'EOF'
+    # Remote-control workflow (laptop -> this sprite over ssh -p 2000). Managed by ~/arranque/justfile.
+    X11Forwarding yes
+    X11UseLocalhost yes
+    ClientAliveInterval 15
+    ClientAliveCountMax 4
+    AllowTcpForwarding yes
+    EOF
+    sudo sshd -t
+    sudo service ssh reload
+    echo ">>> Effective values:"
+    sudo sshd -T | grep -Ei 'x11forwarding|x11uselocalhost|clientalive|allowtcpforwarding'
 
 primerito: default
      git config --global url."https://github.com/".insteadOf git@github.com:
