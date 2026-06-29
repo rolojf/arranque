@@ -44,6 +44,8 @@ setup-ssh:
 sshd-remote-config:
     #!/bin/bash
     set -euo pipefail
+    sudo apt install -y openssh-server
+    sprite-env services create sshd --cmd /usr/sbin/sshd
     sudo tee /etc/ssh/sshd_config.d/10-sprite-remote.conf > /dev/null <<'EOF'
     # Remote-control workflow (laptop -> this sprite over ssh -p 2000). Managed by ~/arranque/justfile.
     X11Forwarding yes
