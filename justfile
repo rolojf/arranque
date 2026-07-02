@@ -8,8 +8,7 @@ default:
         sudo apt update
         sudo apt upgrade
         npm -g update
-        npm -g upgrade
-        cargo install-update -a -c /.sprite/languages/rust/cargo
+        cargo install-update -a
 
 emacs: default pre-emacs
     sudo apt install emacs ripgrep -y
@@ -61,8 +60,6 @@ sshd-remote-config:
 
 primerito: default
      git config --global url."https://github.com/".insteadOf git@github.com:
-     sudo apt install -y openssh-server
-     sprite-env services create sshd --cmd /usr/sbin/sshd
      mkdir -p ~/.ssh
      chmod 700 ~/.ssh
      @read -p "Enter the text to add: " input; \

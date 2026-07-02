@@ -11,6 +11,6 @@ emacs-remoto:
     pueue parallel 3
     (exec 3<>/dev/tcp/localhost/2000) 2>/dev/null && echo "proxy :2000 already up" || pueue add -- sprite -s {{segundo}} proxy 2000:22 8000
     timeout 30 bash -c 'until (exec 3<>/dev/tcp/localhost/2000) 2>/dev/null; do sleep 0.3; done' || { echo "proxy never came up on :2000"; exit 1; }
-    mountpoint -q {{mount}} || sshfs -o reconnect sprite: {{mount}}
+    mountpoint -q {{mount}} || sshfs -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=4 sprite: {{mount}}
     sprite -s {{segundo}} c
     emacs
