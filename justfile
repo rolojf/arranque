@@ -1,6 +1,6 @@
 pre-emacs:
-        cargo install cargo-cache tree-sitter-cli
-        npm install -g @agentclientprotocol/claude-agent-acp
+        cargo install tree-sitter-cli
+        # npm install -g @agentclientprotocol/claude-agent-acp
         npm install lamdera@latest elm-test-rs elm@latest-0.19.1 elm-format @elm-tooling/elm-language-server prettier
         sudo apt install hunspell hunspell-en-us hunspell-es
 
@@ -10,7 +10,7 @@ default:
         npm -g update
         cargo install-update -a
 
-emacs: default pre-emacs
+emacs:
     sudo apt install emacs ripgrep -y
     git clone --depth 1 https://github.com/plexus/chemacs2.git ~/.emacs.d
     git clone --depth 1 https://github.com/purcell/emacs.d.git ~/purcell
@@ -18,7 +18,7 @@ emacs: default pre-emacs
     git clone --depth 1 https://github.com/rolojf/site-lisp.git ~/purcell/site-lisp
     rm ~/purcell/site-lisp/setup-wsl.el
     sed -i 's/^(require '\''setup-wsl)$/;; (require '\''setup-wsl)/' ~/purcell/site-lisp/init-local.el
-    echo "(("default" . ((user-emacs-directory . "~/purcell"))))" >> ~/.emacs-profiles.el
+    echo "((\"default\" . ((user-emacs-directory . \"~/purcell\"))))" >> ~/.emacs-profiles.el
     echo 'export EDITOR="emacsclient -nw"' >> ~/.bashrc
 
 # confirmar primero que npm (me parece extraño ) no esté en el PATH, corregir con
@@ -44,9 +44,13 @@ sshd-remote-config:
     #!/bin/bash
     set -euo pipefail
     sudo apt install -y openssh-server
-    sprite-env services create sshd --cmd /usr/sbin/sshd
+    sudo mkdir -p /run/sshd
+    sudo chown root:root /run/sshd
+    sudo chmod 755 /run/sshd
     sudo tee /etc/ssh/sshd_config.d/10-sprite-remote.conf > /dev/null <<'EOF'
-    # Remote-control workflow (laptop -> this sprite over ssh -p 2000). Managed by ~/arranque/justfile.
+    PubkeyAuthentication yes
+    PasswordAuthentication no
+    KbdInteractiveAuthentication no
     X11Forwarding yes
     X11UseLocalhost yes
     ClientAliveInterval 15
@@ -54,22 +58,22 @@ sshd-remote-config:
     AllowTcpForwarding yes
     EOF
     sudo sshd -t
-    sudo service ssh reload
+#   sudo service ssh reload
+    sudo service ssh restart || sudo service ssh start
+    sprite-env services create sshd --cmd /usr/sbin/sshd || true
     echo ">>> Effective values:"
-    sudo sshd -T | grep -Ei 'x11forwarding|x11uselocalhost|clientalive|allowtcpforwarding'
+    sudo sshd -T | grep -Ei 'pubkeyauthentication|passwordauthentication|kbdinteractiveauthentication|x11forwarding|x11uselocalhost|clientalive|allowtcpforwarding'
 
-primerito: default
+
+primerito: sshd-remote-config
      git config --global url."https://github.com/".insteadOf git@github.com:
-     mkdir -p ~/.ssh
-     chmod 700 ~/.ssh
-     @read -p "Enter the text to add: " input; \
-     echo "$input" >> ~/.ssh/authorized_keys
-     chmod 600 ~/.ssh/authorized_keys
      cargo install cargo-update
      mkdir -p ~/.local/share/Trash/{files,info}
      sudo apt install trash-cli
      ln -s ~/arranque/justfile ~/.justfile
      ln -s ~/arranque/.bash_profile ~/
+     rustup default stable
+     cargo install cargo-cache cargo-update
 
 config-ccode:
     # por definir clonar .claude en mi github repo
