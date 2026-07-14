@@ -22,7 +22,13 @@ default:
     if (exec 3<>/dev/tcp/localhost/"$port") 2>/dev/null; then
       echo "proxy :$port already up"
     else
-      pueue add -- sprite -s "$sprite_name" proxy "$port:22" 8000
+      proxy_ports=("$port:22")
+      if (exec 3<>/dev/tcp/localhost/8000) 2>/dev/null; then
+        echo "local port 8000 already in use; starting SSH proxy only"
+      else
+        proxy_ports+=(8000)
+      fi
+      pueue add -- sprite -s "$sprite_name" proxy "${proxy_ports[@]}"
     fi
     timeout 30 bash -c 'until (exec 3<>/dev/tcp/localhost/"$0") 2>/dev/null; do sleep 0.3; done' "$port" || {
       echo "proxy never came up on :$port"
