@@ -1,14 +1,20 @@
 set shell := ["bash", "-cu"]
 
-mount := "/home/a1rolo/s"
 segundo := "segundo"
 
-# Levanta sshd remoto, proxy en pueue + sshfs montado en  ~/s/
+# Levanta sshd remoto, proxy en pueue + sshfs montado en la carpeta elegida
 default:
     #!/usr/bin/env bash
     set -euo pipefail
     read -rp "Sprite name: " sprite_name
     read -rp "Local SSH port: " port
+    read -erp "Local SSHFS mount folder [$HOME/s]: " mount_dir
+    mount_dir="${mount_dir:-$HOME/s}"
+    case "$mount_dir" in
+      '~') mount_dir="$HOME" ;;
+      '~/'*) mount_dir="$HOME/${mount_dir:2}" ;;
+    esac
+    mkdir -p "$mount_dir"
     ssh -O exit sprite 2>/dev/null || true
     sprite -s "$sprite_name" x service ssh status >/dev/null 2>&1 || sprite -s "$sprite_name" x sudo service ssh start
     pueue status >/dev/null 2>&1 || pueued -d
@@ -22,9 +28,9 @@ default:
       echo "proxy never came up on :$port"
       exit 1
     }
-    mountpoint -q {{mount}} || \
+    mountpoint -q "$mount_dir" || \
       sshfs -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=4 \
-        -p "$port" sprite@localhost: {{mount}}
+        -p "$port" sprite@localhost: "$mount_dir"
     sprite -s "$sprite_name" c
 
 

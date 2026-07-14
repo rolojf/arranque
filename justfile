@@ -58,12 +58,10 @@ sshd-remote-config:
     AllowTcpForwarding yes
     EOF
     sudo sshd -t
-#   sudo service ssh reload
+    sprite-env services create sshd -- cmd /usr/sbin/sshd || true
     sudo service ssh restart || sudo service ssh start
-    sprite-env services create sshd --cmd /usr/sbin/sshd || true
     echo ">>> Effective values:"
     sudo sshd -T | grep -Ei 'pubkeyauthentication|passwordauthentication|kbdinteractiveauthentication|x11forwarding|x11uselocalhost|clientalive|allowtcpforwarding'
-
 
 primerito: sshd-remote-config
      git config --global url."https://github.com/".insteadOf git@github.com:
