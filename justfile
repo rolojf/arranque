@@ -8,7 +8,9 @@ default:
         sudo apt update
         sudo apt upgrade
         npm -g update
-        cargo install-update -a
+        RUSTUP_TOOLCHAIN=stable CARGO_HOME=/.sprite/languages/rust/cargo cargo install-update -a
+        RUSTUP_TOOLCHAIN=stable CARGO_HOME=/.sprite/languages/rust/cargo cargo cache --autoclean
+
 
 emacs:
     sudo apt install emacs ripgrep -y
